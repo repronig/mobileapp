@@ -7,7 +7,7 @@ class Env {
 
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://staging-api.repronig.org/api/v1',
+    defaultValue: 'https://api.repronig.org/api/v1',
   );
 
   static const String appName = String.fromEnvironment(

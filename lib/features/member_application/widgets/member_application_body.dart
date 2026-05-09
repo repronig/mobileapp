@@ -59,6 +59,7 @@ class _MemberApplicationBodyState extends ConsumerState<MemberApplicationBody> {
   var _consentAccepted = false;
   DateTime? _consentDate;
   var _saving = false;
+  var _mandateDownloadBusy = false;
   String? _uploadingDocType;
 
   MemberApplicationDetail? get _app => widget.workspace.application;
@@ -804,6 +805,8 @@ class _MemberApplicationBodyState extends ConsumerState<MemberApplicationBody> {
   Future<void> _downloadMandateData() async {
     final app = _app;
     if (app == null || app.applicationStatus != 'approved') return;
+    if (_mandateDownloadBusy) return;
+    setState(() => _mandateDownloadBusy = true);
     try {
       final response = await ref
           .read(memberApplicationApiProvider)
@@ -836,6 +839,8 @@ class _MemberApplicationBodyState extends ConsumerState<MemberApplicationBody> {
       }
     } on ApiException catch (e) {
       if (mounted) MemberFeedback.showError(context, e);
+    } finally {
+      if (mounted) setState(() => _mandateDownloadBusy = false);
     }
   }
 
@@ -1634,8 +1639,43 @@ class _MemberApplicationBodyState extends ConsumerState<MemberApplicationBody> {
           if (app != null && app.applicationStatus == 'approved') ...[
             _sectionGap(),
             FilledButton.tonal(
-              onPressed: _downloadMandateData,
-              child: const Text('Download Mandate'),
+              onPressed: _mandateDownloadBusy ? null : _downloadMandateData,
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 22,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadii.md),
+                ),
+              ),
+              child: _mandateDownloadBusy
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Downloading…',
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w700,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Text(
+                      'Download Mandate',
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+                    ),
             ),
           ],
         ],
