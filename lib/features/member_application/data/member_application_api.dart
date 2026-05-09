@@ -110,7 +110,7 @@ class MemberApplicationApi {
       throw ApiException.fromDioResponse(
         statusCode: e.response?.statusCode,
         data: e.response?.data,
-        fallbackMessage: 'Could not download mandate form.',
+        fallbackMessage: 'Could not download mandate.',
       );
     }
   }

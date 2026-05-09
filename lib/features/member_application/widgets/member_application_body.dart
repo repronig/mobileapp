@@ -1,12 +1,13 @@
-import 'dart:convert';
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app/theme.dart';
@@ -807,34 +808,32 @@ class _MemberApplicationBodyState extends ConsumerState<MemberApplicationBody> {
       final response = await ref
           .read(memberApplicationApiProvider)
           .downloadMandate(app.id);
-      final content = utf8.decode(response.data ?? const <int>[]);
+      final bytes = response.data;
+      if (bytes == null || bytes.isEmpty) {
+        if (mounted) {
+          MemberFeedback.showError(
+            context,
+            const ApiException(message: 'No mandate file was returned.'),
+          );
+        }
+        return;
+      }
+      final tempDir = await getTemporaryDirectory();
+      final safeRef = (app.applicationReference ?? 'app-${app.id}')
+          .replaceAll(RegExp(r'[^a-zA-Z0-9._-]'), '-');
+      final file = File('${tempDir.path}/repronig-mandate-$safeRef.pdf');
+      await file.writeAsBytes(bytes);
       if (!mounted) return;
-      await showDialog<void>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          shape: appDialogShape(),
-          title: const Text('Mandate form data'),
-          content: SingleChildScrollView(
-            child: SelectableText(
-              content.isEmpty ? 'No mandate data returned.' : content,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                await Clipboard.setData(ClipboardData(text: content));
-                if (mounted)
-                  MemberFeedback.showSuccess(context, 'Mandate data copied.');
-              },
-              child: const Text('Copy'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Close'),
-            ),
-          ],
-        ),
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'application/pdf')],
+        subject: 'REPRONIG membership mandate',
       );
+      if (mounted) {
+        MemberFeedback.showSuccess(
+          context,
+          'Mandate PDF ready — save from the share sheet to Files or your preferred location.',
+        );
+      }
     } on ApiException catch (e) {
       if (mounted) MemberFeedback.showError(context, e);
     }
@@ -1636,7 +1635,7 @@ class _MemberApplicationBodyState extends ConsumerState<MemberApplicationBody> {
             _sectionGap(),
             FilledButton.tonal(
               onPressed: _downloadMandateData,
-              child: const Text('Download mandate form data'),
+              child: const Text('Download Mandate'),
             ),
           ],
         ],
