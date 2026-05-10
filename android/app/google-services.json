@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "144354878633",
+    "project_id": "repronig-6039d",
+    "storage_bucket": "repronig-6039d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:144354878633:android:22bb9fafab4f0632c2f5b8",
+        "android_client_info": {
+          "package_name": "org.repronig.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAowijiFlMBKAy_onm7R-7-itL8Wt2StKY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

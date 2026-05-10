@@ -1,0 +1,20 @@
+# Play Store / release signing
+# ---------------------------
+# 1. Copy this file to: android/key.properties  (same directory as this example)
+# 2. Never commit key.properties or your .jks file (they are gitignored).
+# 3. Put your upload keystore file in android/ (e.g. upload-keystore.jks) OR set storeFile to a path
+#    relative to the android/ folder, e.g. app/upload-keystore.jks
+#
+# Generate an upload keystore (run once; store passwords in a password manager):
+#
+#   cd android
+#   keytool -genkey -v -keystore upload-keystore.jks -storetype JKS -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+#
+# Then fill in the four values below to match what you chose in keytool.
+# Do not wrap values in quotes. Avoid trailing spaces after passwords.
+# Verify locally:  keytool -list -keystore upload-keystore.jks -alias upload
+
+storePassword=your-keystore-store-password
+keyPassword=your-key-password
+keyAlias=upload
+storeFile=upload-keystore.jks

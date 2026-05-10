@@ -312,7 +312,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 decoration: memberFormInputDecoration(
                   theme,
-                  hint: 'Select society',
+                  hint: 'Select Association',
                 ),
                 dropdownColor: theme.colorScheme.surface,
                 iconEnabledColor: theme.colorScheme.onSurfaceVariant,

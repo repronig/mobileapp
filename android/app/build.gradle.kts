@@ -1,12 +1,27 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    // The Flutter Gradle Plugin must be applied after the Android Gradle and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Release signing: copy android/key.properties.example to android/key.properties and add your keystore.
+// See https://docs.flutter.dev/deployment/android#signing-the-app
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+val hasReleaseKeystore = keystorePropertiesFile.exists()
+if (hasReleaseKeystore) {
+    keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
+}
+
+fun keystoreProp(props: Properties, name: String): String =
+    props.getProperty(name)?.trim()?.takeIf { it.isNotEmpty() }
+        ?: error("key.properties: missing or blank $name")
+
 android {
-    namespace = "ng.repronig.mobile.repronig_mobile"
+    namespace = "org.repronig.app"
     compileSdk = flutter.compileSdkVersion
     // Plugins (file_picker, secure storage, image_picker, etc.) require NDK 27+.
     ndkVersion = "27.0.12077973"
@@ -22,20 +37,34 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "ng.repronig.mobile.repronig_mobile"
+        applicationId = "org.repronig.app"
         // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        // For more information, see: https://flutter.dev/to/review-gradle.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                keyAlias = keystoreProp(keystoreProperties, "keyAlias")
+                keyPassword = keystoreProp(keystoreProperties, "keyPassword")
+                storePassword = keystoreProp(keystoreProperties, "storePassword")
+                storeFile = rootProject.file(keystoreProp(keystoreProperties, "storeFile"))
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (hasReleaseKeystore) {
+                signingConfigs.getByName("release")
+            } else {
+                // Local release builds without key.properties (e.g. CI); use debug signing — not for Play Store upload.
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }

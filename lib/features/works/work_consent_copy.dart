@@ -12,7 +12,7 @@ abstract final class WorkConsentCopy {
 
   static const paragraph2 =
       'You represent to REPRONIG that you are the rightful owner of the works submitted via the '
-      'REPRONIG registration portal, as updated by you from time to time, and that you have authorization '
+      'REPRONIG portal, as updated by you from time to time, and that you have authorization '
       'to collect royalties in Nigeria for the reproduction and communication to the public by '
       'telecommunication of published literary, dramatic, artistic, and sheet music and lyrics owned by you.';
 }

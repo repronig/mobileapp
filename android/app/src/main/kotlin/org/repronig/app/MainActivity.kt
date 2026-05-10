@@ -1,4 +1,4 @@
-package ng.repronig.mobile.repronig_mobile
+package org.repronig.app
 
 import io.flutter.embedding.android.FlutterActivity
 

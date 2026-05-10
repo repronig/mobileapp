@@ -46,6 +46,10 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>REPRONIG uses the camera so you can photograph proof of ID and proof of address for your membership application.</string>
+	<string>REPRONIG uses the camera to capture photos for your membership application (including ID and address documents), your profile picture, and images you attach to your professional work entries.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>REPRONIG needs access to your photo library so you can choose an existing photo for your profile picture or to attach images to your work entries.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
